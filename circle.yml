@@ -1,4 +1,6 @@
 general:
+  artifacts:
+        - /home/ubuntu/cctest/app/build/outputs/apk/
   branches:
     only: develop
 
