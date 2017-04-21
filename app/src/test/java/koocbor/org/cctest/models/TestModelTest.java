@@ -12,11 +12,12 @@ import static org.junit.Assert.*;
  */
 public class TestModelTest {
 
+    Faker faker;
     private String randomString;
 
     @Before
     public void setUp() {
-        Faker faker = new Faker();
+        faker = new Faker();
         randomString = faker.lorem().characters(10);
     }
 
@@ -31,6 +32,20 @@ public class TestModelTest {
         String outValue = model.getValue();
         assertEquals(randomString, outValue);
 
+    }
+
+    @Test
+    public void testAdd() {
+        TestModel model = new TestModel();
+        assertNotNull(model);
+
+        int a = faker.number().numberBetween(5, 15);
+        int b = faker.number().numberBetween(3, 6);
+
+        int sum = a + b;
+        int outSum = model.add(a, b);
+
+        assertEquals(sum, outSum);
     }
 
 }
