@@ -1,4 +1,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
+apply plugin: 'jacoco'
+apply plugin: 'com.github.kt3k.coveralls'
+apply plugin: 'java'
 
 buildscript {
     repositories {
@@ -6,6 +9,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.3.1'
+        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.3.1'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -18,6 +22,73 @@ allprojects {
     }
 }
 
-task clean(type: Delete) {
-    delete rootProject.buildDir
+subprojects { proj ->
+    apply plugin: 'jacoco'
+
+    jacoco {
+        version "0.7.5.201505241946"
+    }
+
+    task jacocoTestReport(type: JacocoReport) {
+        group = "Reporting"
+        description = "Generate Jacoco coverage reports after running tests."
+        reports {
+            xml.enabled = true
+            html.enabled = true
+        }
+        classDirectories = fileTree(
+                dir: 'build/intermediates/classes/debug',
+                excludes: ['**/R*.class',
+                           '**/BuildConfig*'])
+        sourceDirectories = files('src/main/java')
+        executionData = files('build/jacoco/testDebugUnitTest.exec')
+        doFirst {
+            files('build/intermediates/classes/debug').getFiles().each { file ->
+                if (file.name.contains('$$')) {
+                    file.renameTo(file.path.replace('$$', '$'))
+                }
+            }
+        }
+    }
+}
+
+jacoco {
+    toolVersion "0.7.5.201505241946"
+}
+
+task jacocoRootReport(type: JacocoReport, group: 'Coverage reports') {
+    group = "Reporting"
+    description = 'Generates an aggregate report from all subprojects'
+    dependsOn(subprojects.jacocoTestReport)
+
+    additionalSourceDirs = files('app/src/main/java')
+    sourceDirectories = files('app/src/main/java')
+    classDirectories = files('app/build/intermediates/classes/debug')
+    executionData = files(subprojects.jacocoTestReport.executionData)
+
+    reports {
+        html.enabled = true
+        xml.enabled = true
+    }
+
+    onlyIf = {
+        true
+    }
+
+    doFirst {
+        executionData = files(executionData.findAll { it.exists() })
+    }
+}
+
+coveralls {
+    sourceDirs = files('library/src/main/java').flatten()
+    jacocoReportPath = "${buildDir}/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
+}
+
+tasks.coveralls {
+    group = 'Coverage reports'
+    description = 'Uploads the aggregated coverage report to Coveralls'
+
+    dependsOn jacocoRootReport
+    onlyIf { System.env.'CI' }
 }
