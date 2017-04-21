@@ -1,3 +1,7 @@
+general:
+  branches:
+    only: develop
+
 dependencies:
   pre:
     # Android SDK Platform 25 (Nougat 7.1.1)
