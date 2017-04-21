@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/koocbor/cctest.svg?style=svg)](https://circleci.com/gh/koocbor/cctest) 
+[![CircleCI](https://circleci.com/gh/koocbor/cctest/tree/develop.svg?style=shield)](https://circleci.com/gh/koocbor/cctest/tree/develop) 
 [![Coverage Status](https://coveralls.io/repos/github/koocbor/cctest/badge.svg?branch=develop)](https://coveralls.io/github/koocbor/cctest?branch=develop)
 
 # cctest
